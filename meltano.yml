@@ -1,0 +1,44 @@
+version: 1
+default_environment: dev
+project_id: 8568ea65-6b06-4c8d-8712-7e33e101bde6
+environments:
+- name: dev
+- name: staging
+- name: prod
+plugins:
+  extractors:
+  - name: tap-google-sheets
+    variant: singer-io
+    pip_url: git+https://github.com/singer-io/tap-google-sheets.git
+    config:
+      client_id: 333138405234-qafbteuc3r88v9kinl6l0nh95fn1k3v8.apps.googleusercontent.com
+      spreadsheet_id: 119lz6YKd45H1l-Qi6YQdTSwXOK03PItow3WLx7nviPo
+      start_date: '2023-01-07 00:00:00.000'
+      user_agent: msen-meltano-agent
+    select:
+    - Investments.investment_instrument
+    - Investments.investment_date
+    - Investments.price
+    - Investments.amount
+  - name: tap-turkish_lira_parities
+    namespace: tap_turkish_lira_parities
+    pip_url: -e tap-turkish_lira_parities
+    executable: tap-turkish_lira_parities
+    capabilities:
+    - discover
+    settings:
+    - name: Minimum Date
+    - name: Maximum Date
+    config:
+      Minimum Date: '2019-01-01'
+  loaders:
+  - name: target-parquet
+    variant: estrategiahq
+    pip_url: git+https://github.com/estrategiahq/target-parquet.git
+    config:
+      destination_path: output
+  - name: target-jsonl
+    variant: andyh1203
+    pip_url: target-jsonl
+    config:
+      destination_path: output
